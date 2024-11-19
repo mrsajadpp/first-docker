@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  node:
+    build:
+      context: .
+    container_name: covein
+    ports:
+      - "3002:3001"
+    depends_on:
+      - mongo
+    volumes:
+      - ./app:/usr/src/app
+    environment:
+      MONGO_URL: mongodb://mongo:27018/mydb
+
+  mongo:
+    image: mongodb/mongodb-community-server:7.0-ubi8
+    container_name: mongo_db
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodata:/data/db
+
+  nginx:
+    image: nginx:1.27.2
+    container_name: nginx_server
+    ports:
+      - "81:80"
+    depends_on:
+      - node
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    restart: always
+
+volumes:
+  mongodata:
